@@ -6,45 +6,8 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 
 public class ItemClickSupport {
-    /**
-     * Interface definition for a callback to be invoked when an item in the
-     * RecyclerView has been clicked.
-     */
-    public interface OnItemClickListener {
-        /**
-         * Callback method to be invoked when an item in the RecyclerView
-         * has been clicked.
-         *
-         * @param parent The RecyclerView where the click happened.
-         * @param view The view within the RecyclerView that was clicked
-         * @param position The position of the view in the adapter.
-         * @param id The row id of the item that was clicked.
-         */
-        void onItemClick(RecyclerView parent, View view, int position, long id);
-    }
-
-    /**
-     * Interface definition for a callback to be invoked when an item in the
-     * RecyclerView has been clicked and held.
-     */
-    public interface OnItemLongClickListener {
-        /**
-         * Callback method to be invoked when an item in the RecyclerView
-         * has been clicked and held.
-         *
-         * @param parent The RecyclerView where the click happened
-         * @param view The view within the RecyclerView that was clicked
-         * @param position The position of the view in the list
-         * @param id The row id of the item that was clicked
-         *
-         * @return true if the callback consumed the long click, false otherwise
-         */
-        boolean onItemLongClick(RecyclerView parent, View view, int position, long id);
-    }
-
     private final RecyclerView mRecyclerView;
     private final TouchListener mTouchListener;
-
     private OnItemClickListener mItemClickListener;
     private OnItemLongClickListener mItemLongClickListener;
 
@@ -53,30 +16,6 @@ public class ItemClickSupport {
 
         mTouchListener = new TouchListener(recyclerView);
         recyclerView.addOnItemTouchListener(mTouchListener);
-    }
-
-    /**
-     * Register a callback to be invoked when an item in the
-     * RecyclerView has been clicked.
-     *
-     * @param listener The callback that will be invoked.
-     */
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        mItemClickListener = listener;
-    }
-
-    /**
-     * Register a callback to be invoked when an item in the
-     * RecyclerView has been clicked and held.
-     *
-     * @param listener The callback that will be invoked.
-     */
-    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
-        if (!mRecyclerView.isLongClickable()) {
-            mRecyclerView.setLongClickable(true);
-        }
-
-        mItemLongClickListener = listener;
     }
 
     public static ItemClickSupport addTo(RecyclerView recyclerView) {
@@ -108,6 +47,65 @@ public class ItemClickSupport {
         }
 
         return (ItemClickSupport) recyclerView.getTag(R.id.twowayview_item_click_support);
+    }
+
+    /**
+     * Register a callback to be invoked when an item in the
+     * RecyclerView has been clicked.
+     *
+     * @param listener The callback that will be invoked.
+     */
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mItemClickListener = listener;
+    }
+
+    /**
+     * Register a callback to be invoked when an item in the
+     * RecyclerView has been clicked and held.
+     *
+     * @param listener The callback that will be invoked.
+     */
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        if (!mRecyclerView.isLongClickable()) {
+            mRecyclerView.setLongClickable(true);
+        }
+
+        mItemLongClickListener = listener;
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when an item in the
+     * RecyclerView has been clicked.
+     */
+    public interface OnItemClickListener {
+        /**
+         * Callback method to be invoked when an item in the RecyclerView
+         * has been clicked.
+         *
+         * @param parent   The RecyclerView where the click happened.
+         * @param view     The view within the RecyclerView that was clicked
+         * @param position The position of the view in the adapter.
+         * @param id       The row id of the item that was clicked.
+         */
+        void onItemClick(RecyclerView parent, View view, int position, long id);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when an item in the
+     * RecyclerView has been clicked and held.
+     */
+    public interface OnItemLongClickListener {
+        /**
+         * Callback method to be invoked when an item in the RecyclerView
+         * has been clicked and held.
+         *
+         * @param parent   The RecyclerView where the click happened
+         * @param view     The view within the RecyclerView that was clicked
+         * @param position The position of the view in the list
+         * @param id       The row id of the item that was clicked
+         * @return true if the callback consumed the long click, false otherwise
+         */
+        boolean onItemLongClick(RecyclerView parent, View view, int position, long id);
     }
 
     private class TouchListener extends ClickItemTouchListener {

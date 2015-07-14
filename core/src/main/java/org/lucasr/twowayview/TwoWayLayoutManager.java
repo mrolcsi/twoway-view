@@ -24,12 +24,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.Adapter;
-import android.support.v7.widget.RecyclerView.LayoutManager;
-import android.support.v7.widget.RecyclerView.LayoutParams;
-import android.support.v7.widget.RecyclerView.Recycler;
-import android.support.v7.widget.RecyclerView.State;
-import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.support.v7.widget.RecyclerView.*;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -38,28 +33,12 @@ import java.util.List;
 
 public abstract class TwoWayLayoutManager extends LayoutManager {
     private static final String LOGTAG = "TwoWayLayoutManager";
-
-    public static enum Orientation {
-        HORIZONTAL,
-        VERTICAL
-    }
-
-    public static enum Direction {
-        START,
-        END
-    }
-
     private int mScreenOrientation;
-
     private RecyclerView mRecyclerView;
-
     private boolean mIsVertical = true;
-
     private SavedState mPendingSavedState = null;
-
     private int mPendingScrollPosition = RecyclerView.NO_POSITION;
     private int mPendingScrollOffset = 0;
-
     private int mLayoutStart;
     private int mLayoutEnd;
 
@@ -94,12 +73,46 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
         mIsVertical = (orientation == Orientation.VERTICAL);
     }
 
-    public void setScreenOrientation(int orientation) {
-        this.mScreenOrientation = orientation;
+    private static View findNextScrapView(List<ViewHolder> scrapList, Direction direction,
+                                          int position) {
+        final int scrapCount = scrapList.size();
+
+        ViewHolder closest = null;
+        int closestDistance = Integer.MAX_VALUE;
+
+        for (int i = 0; i < scrapCount; i++) {
+            final ViewHolder holder = scrapList.get(i);
+
+            final int distance = holder.getPosition() - position;
+            if ((distance < 0 && direction == Direction.END) ||
+                    (distance > 0 && direction == Direction.START)) {
+                continue;
+            }
+
+            final int absDistance = Math.abs(distance);
+            if (absDistance < closestDistance) {
+                closest = holder;
+                closestDistance = absDistance;
+
+                if (distance == 0) {
+                    break;
+                }
+            }
+        }
+
+        if (closest != null) {
+            return closest.itemView;
+        }
+
+        return null;
     }
 
     public int getScreenOrientation() {
         return mScreenOrientation;
+    }
+
+    public void setScreenOrientation(int orientation) {
+        this.mScreenOrientation = orientation;
     }
 
     private int getTotalSpace() {
@@ -127,7 +140,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     }
 
     protected int getChildEnd(View child) {
-        return (mIsVertical ?  getDecoratedBottom(child) : getDecoratedRight(child));
+        return (mIsVertical ? getDecoratedBottom(child) : getDecoratedRight(child));
     }
 
     protected Adapter getAdapter() {
@@ -238,7 +251,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
         final int absDelta = Math.abs(delta);
         if (canAddMoreViews(Direction.START, start - absDelta) ||
-            canAddMoreViews(Direction.END, end + absDelta)) {
+                canAddMoreViews(Direction.END, end + absDelta)) {
             fillGap(direction, recycler, state);
         }
 
@@ -334,7 +347,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
         // Make sure we are 1) Too high, and 2) Either there are more rows above the
         // first row or the first row is scrolled off the top of the drawable area
-        if (endOffset > 0 && (firstPosition > 0 || mLayoutStart < start))  {
+        if (endOffset > 0 && (firstPosition > 0 || mLayoutStart < start)) {
             if (firstPosition == 0) {
                 // Don't pull the top too far down.
                 endOffset = Math.min(endOffset, start - mLayoutStart);
@@ -375,7 +388,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
         // last column/row or the last column/row is scrolled off the end of the
         // drawable area.
         if (startOffset > 0) {
-            if (lastPosition < itemCount - 1 || mLayoutEnd > end)  {
+            if (lastPosition < itemCount - 1 || mLayoutEnd > end) {
                 if (lastPosition == itemCount - 1) {
                     // Don't pull the bottom too far up.
                     startOffset = Math.min(startOffset, mLayoutEnd - end);
@@ -412,40 +425,6 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
         if (delta != 0) {
             offsetChildren(-delta);
         }
-    }
-
-    private static View findNextScrapView(List<ViewHolder> scrapList, Direction direction,
-                                          int position) {
-        final int scrapCount = scrapList.size();
-
-        ViewHolder closest = null;
-        int closestDistance = Integer.MAX_VALUE;
-
-        for (int i = 0; i < scrapCount; i++) {
-            final ViewHolder holder = scrapList.get(i);
-
-            final int distance = holder.getPosition() - position;
-            if ((distance < 0 && direction == Direction.END) ||
-                    (distance > 0 && direction == Direction.START)) {
-                continue;
-            }
-
-            final int absDistance = Math.abs(distance);
-            if (absDistance < closestDistance) {
-                closest = holder;
-                closestDistance = absDistance;
-
-                if (distance == 0) {
-                    break;
-                }
-            }
-        }
-
-        if (closest != null) {
-            return closest.itemView;
-        }
-
-        return null;
     }
 
     private void fillFromScrapList(List<ViewHolder> scrapList, Direction direction) {
@@ -969,13 +948,35 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     }
 
     protected abstract void measureChild(View child, Direction direction);
+
     protected abstract void layoutChild(View child, Direction direction);
 
     protected abstract boolean canAddMoreViews(Direction direction, int limit);
 
-    protected static class SavedState implements Parcelable {
-        protected static final SavedState EMPTY_STATE = new SavedState();
+    public static enum Orientation {
+        HORIZONTAL,
+        VERTICAL
+    }
 
+    public static enum Direction {
+        START,
+        END
+    }
+
+    protected static class SavedState implements Parcelable {
+        public static final Parcelable.Creator<SavedState> CREATOR
+                = new Parcelable.Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+        protected static final SavedState EMPTY_STATE = new SavedState();
         private final Parcelable superState;
         private int anchorItemPosition;
         private Bundle itemSelectionState;
@@ -1012,18 +1013,5 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
             out.writeInt(anchorItemPosition);
             out.writeParcelable(itemSelectionState, flags);
         }
-
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 }

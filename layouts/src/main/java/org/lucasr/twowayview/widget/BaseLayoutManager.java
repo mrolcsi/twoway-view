@@ -36,110 +36,13 @@ import static org.lucasr.twowayview.widget.Lanes.calculateLaneSize;
 public abstract class BaseLayoutManager extends TwoWayLayoutManager {
 
     private static final String LOGTAG = "BaseLayoutManager";
-
-    protected static class ItemEntry implements Parcelable {
-        public int startLane;
-        public int anchorLane;
-
-        private int[] spanMargins;
-
-        public ItemEntry(int startLane, int anchorLane) {
-            this.startLane = startLane;
-            this.anchorLane = anchorLane;
-        }
-
-        public ItemEntry(Parcel in) {
-            startLane = in.readInt();
-            anchorLane = in.readInt();
-
-            final int marginCount = in.readInt();
-            if (marginCount > 0) {
-                spanMargins = new int[marginCount];
-                for (int i = 0; i < marginCount; i++) {
-                    spanMargins[i] = in.readInt();
-                }
-            }
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            out.writeInt(startLane);
-            out.writeInt(anchorLane);
-
-            final int marginCount = (spanMargins != null ? spanMargins.length : 0);
-            out.writeInt(marginCount);
-
-            for (int i = 0; i < marginCount; i++) {
-                out.writeInt(spanMargins[i]);
-            }
-        }
-
-        void setLane(LaneInfo laneInfo) {
-            startLane = laneInfo.startLane;
-            anchorLane = laneInfo.anchorLane;
-        }
-
-        void invalidateLane() {
-            startLane = Lanes.NO_LANE;
-            anchorLane = Lanes.NO_LANE;
-            spanMargins = null;
-        }
-
-        private boolean hasSpanMargins() {
-            return (spanMargins != null);
-        }
-
-        private int getSpanMargin(int index) {
-            if (spanMargins == null) {
-                return 0;
-            }
-
-            return spanMargins[index];
-        }
-
-        private void setSpanMargin(int index, int margin, int span) {
-            if (spanMargins == null) {
-                spanMargins = new int[span];
-            }
-
-            spanMargins[index] = margin;
-        }
-
-        public static final Creator<ItemEntry> CREATOR
-                = new Creator<ItemEntry>() {
-            @Override
-            public ItemEntry createFromParcel(Parcel in) {
-                return new ItemEntry(in);
-            }
-
-            @Override
-            public ItemEntry[] newArray(int size) {
-                return new ItemEntry[size];
-            }
-        };
-    }
-
-    private enum UpdateOp {
-        ADD,
-        REMOVE,
-        UPDATE,
-        MOVE
-    }
-
-    private Lanes mLanes;
-    private Lanes mLanesToRestore;
-
-    private ItemEntries mItemEntries;
-    private ItemEntries mItemEntriesToRestore;
-
     protected final Rect mChildFrame = new Rect();
     protected final Rect mTempRect = new Rect();
     protected final LaneInfo mTempLaneInfo = new LaneInfo();
+    private Lanes mLanes;
+    private Lanes mLanesToRestore;
+    private ItemEntries mItemEntries;
+    private ItemEntries mItemEntriesToRestore;
 
     public BaseLayoutManager(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -156,7 +59,7 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
     protected void pushChildFrame(ItemEntry entry, Rect childFrame, int lane, int laneSpan,
                                   Direction direction) {
         final boolean shouldSetMargins = (direction == Direction.END &&
-                                          entry != null && !entry.hasSpanMargins());
+                entry != null && !entry.hasSpanMargins());
 
         for (int i = lane; i < lane + laneSpan; i++) {
             final int spanMargin;
@@ -264,8 +167,8 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         final int laneSize = calculateLaneSize(this, laneCount);
 
         return (lanes.getOrientation() == getOrientation() &&
-                 lanes.getCount() == laneCount &&
-                 lanes.getLaneSize() == laneSize);
+                lanes.getCount() == laneCount &&
+                lanes.getLaneSize() == laneSize);
     }
 
     private boolean ensureLayoutState() {
@@ -441,7 +344,7 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
             mLanesToRestore = new Lanes(this, ss.orientation, ss.lanes, ss.laneSize);
             mItemEntriesToRestore = ss.itemEntries;
         } else {
-            if(mItemEntries!=null) {
+            if (mItemEntries != null) {
                 mItemEntries.clear();
             }
             invalidateItemLanesAfter(0);
@@ -575,10 +478,116 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
     }
 
     abstract int getLaneCount();
+
     abstract void getLaneForPosition(LaneInfo outInfo, int position, Direction direction);
+
     abstract void moveLayoutToPosition(int position, int offset, Recycler recycler, State state);
 
+    private enum UpdateOp {
+        ADD,
+        REMOVE,
+        UPDATE,
+        MOVE
+    }
+
+    protected static class ItemEntry implements Parcelable {
+        public static final Creator<ItemEntry> CREATOR
+                = new Creator<ItemEntry>() {
+            @Override
+            public ItemEntry createFromParcel(Parcel in) {
+                return new ItemEntry(in);
+            }
+
+            @Override
+            public ItemEntry[] newArray(int size) {
+                return new ItemEntry[size];
+            }
+        };
+        public int startLane;
+        public int anchorLane;
+        private int[] spanMargins;
+
+        public ItemEntry(int startLane, int anchorLane) {
+            this.startLane = startLane;
+            this.anchorLane = anchorLane;
+        }
+
+        public ItemEntry(Parcel in) {
+            startLane = in.readInt();
+            anchorLane = in.readInt();
+
+            final int marginCount = in.readInt();
+            if (marginCount > 0) {
+                spanMargins = new int[marginCount];
+                for (int i = 0; i < marginCount; i++) {
+                    spanMargins[i] = in.readInt();
+                }
+            }
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            out.writeInt(startLane);
+            out.writeInt(anchorLane);
+
+            final int marginCount = (spanMargins != null ? spanMargins.length : 0);
+            out.writeInt(marginCount);
+
+            for (int i = 0; i < marginCount; i++) {
+                out.writeInt(spanMargins[i]);
+            }
+        }
+
+        void setLane(LaneInfo laneInfo) {
+            startLane = laneInfo.startLane;
+            anchorLane = laneInfo.anchorLane;
+        }
+
+        void invalidateLane() {
+            startLane = Lanes.NO_LANE;
+            anchorLane = Lanes.NO_LANE;
+            spanMargins = null;
+        }
+
+        private boolean hasSpanMargins() {
+            return (spanMargins != null);
+        }
+
+        private int getSpanMargin(int index) {
+            if (spanMargins == null) {
+                return 0;
+            }
+
+            return spanMargins[index];
+        }
+
+        private void setSpanMargin(int index, int margin, int span) {
+            if (spanMargins == null) {
+                spanMargins = new int[span];
+            }
+
+            spanMargins[index] = margin;
+        }
+    }
+
     protected static class LanedSavedState extends SavedState {
+        public static final Parcelable.Creator<LanedSavedState> CREATOR
+                = new Parcelable.Creator<LanedSavedState>() {
+            @Override
+            public LanedSavedState createFromParcel(Parcel in) {
+                return new LanedSavedState(in);
+            }
+
+            @Override
+            public LanedSavedState[] newArray(int size) {
+                return new LanedSavedState[size];
+            }
+        };
         private int screenOrientation;
         private Orientation orientation;
         private Rect[] lanes;
@@ -638,19 +647,6 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
                 out.writeParcelable(itemEntries.getItemEntry(i), flags);
             }
         }
-
-        public static final Parcelable.Creator<LanedSavedState> CREATOR
-                = new Parcelable.Creator<LanedSavedState>() {
-            @Override
-            public LanedSavedState createFromParcel(Parcel in) {
-                return new LanedSavedState(in);
-            }
-
-            @Override
-            public LanedSavedState[] newArray(int size) {
-                return new LanedSavedState[size];
-            }
-        };
     }
 
 

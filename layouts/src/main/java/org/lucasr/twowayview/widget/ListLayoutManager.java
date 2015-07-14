@@ -20,7 +20,6 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView.Recycler;
 import android.support.v7.widget.RecyclerView.State;
 import android.util.AttributeSet;
-
 import org.lucasr.twowayview.widget.Lanes.LaneInfo;
 
 public class ListLayoutManager extends BaseLayoutManager {

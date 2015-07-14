@@ -2,8 +2,6 @@ package org.lucasr.twowayview.widget;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-
 import org.lucasr.twowayview.TwoWayLayoutManager.Direction;
 import org.lucasr.twowayview.widget.Lanes.LaneInfo;
 
@@ -15,10 +13,8 @@ import org.lucasr.twowayview.widget.Lanes.LaneInfo;
 class ItemSpacingOffsets {
     private final int mVerticalSpacing;
     private final int mHorizontalSpacing;
-
-    private boolean mAddSpacingAtEnd;
-
     private final LaneInfo mTempLaneInfo = new LaneInfo();
+    private boolean mAddSpacingAtEnd;
 
     public ItemSpacingOffsets(int verticalSpacing, int horizontalSpacing) {
         if (verticalSpacing < 0 || horizontalSpacing < 0) {
@@ -27,37 +23,6 @@ class ItemSpacingOffsets {
 
         mVerticalSpacing = verticalSpacing;
         mHorizontalSpacing = horizontalSpacing;
-    }
-
-    /**
-     * Checks whether the given position is placed just after the item in the
-     * first lane of the layout taking items spans into account.
-     */
-    private boolean isSecondLane(BaseLayoutManager lm, int itemPosition, int lane) {
-        if (lane == 0 || itemPosition == 0) {
-            return false;
-        }
-
-        int previousLane = Lanes.NO_LANE;
-        int previousPosition = itemPosition - 1;
-        while (previousPosition >= 0) {
-            lm.getLaneForPosition(mTempLaneInfo, previousPosition, Direction.END);
-            previousLane = mTempLaneInfo.startLane;
-            if (previousLane != lane) {
-                break;
-            }
-
-            previousPosition--;
-        }
-
-        if(previousPosition>=0) {
-            final int previousLaneSpan = lm.getLaneSpanForPosition(previousPosition);
-            if (previousLane == 0) {
-                return (lane == previousLane + previousLaneSpan);
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -92,11 +57,42 @@ class ItemSpacingOffsets {
         // TODO: Figure out a robust way to compute this for layouts
         // that are dynamically placed and might span multiple lanes.
         if (lm instanceof SpannableGridLayoutManager ||
-            lm instanceof StaggeredGridLayoutManager) {
+                lm instanceof StaggeredGridLayoutManager) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Checks whether the given position is placed just after the item in the
+     * first lane of the layout taking items spans into account.
+     */
+    private boolean isSecondLane(BaseLayoutManager lm, int itemPosition, int lane) {
+        if (lane == 0 || itemPosition == 0) {
+            return false;
+        }
+
+        int previousLane = Lanes.NO_LANE;
+        int previousPosition = itemPosition - 1;
+        while (previousPosition >= 0) {
+            lm.getLaneForPosition(mTempLaneInfo, previousPosition, Direction.END);
+            previousLane = mTempLaneInfo.startLane;
+            if (previousLane != lane) {
+                break;
+            }
+
+            previousPosition--;
+        }
+
+        if (previousPosition >= 0) {
+            final int previousLaneSpan = lm.getLaneSpanForPosition(previousPosition);
+            if (previousLane == 0) {
+                return (lane == previousLane + previousLaneSpan);
+            }
+        }
+
+        return false;
     }
 
     public void setAddSpacingAtEnd(boolean spacingAtEnd) {

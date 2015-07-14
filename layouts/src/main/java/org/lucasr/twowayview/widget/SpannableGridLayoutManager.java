@@ -27,7 +27,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
-
 import org.lucasr.twowayview.widget.Lanes.LaneInfo;
 
 public class SpannableGridLayoutManager extends GridLayoutManager {
@@ -35,44 +34,6 @@ public class SpannableGridLayoutManager extends GridLayoutManager {
 
     private static final int DEFAULT_NUM_COLS = 3;
     private static final int DEFAULT_NUM_ROWS = 3;
-
-    protected static class SpannableItemEntry extends BaseLayoutManager.ItemEntry {
-        private final int colSpan;
-        private final int rowSpan;
-
-        public SpannableItemEntry(int startLane, int anchorLane, int colSpan, int rowSpan) {
-            super(startLane, anchorLane);
-            this.colSpan = colSpan;
-            this.rowSpan = rowSpan;
-        }
-
-        public SpannableItemEntry(Parcel in) {
-            super(in);
-            this.colSpan = in.readInt();
-            this.rowSpan = in.readInt();
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(colSpan);
-            out.writeInt(rowSpan);
-        }
-
-        public static final Parcelable.Creator<SpannableItemEntry> CREATOR
-                = new Parcelable.Creator<SpannableItemEntry>() {
-            @Override
-            public SpannableItemEntry createFromParcel(Parcel in) {
-                return new SpannableItemEntry(in);
-            }
-
-            @Override
-            public SpannableItemEntry[] newArray(int size) {
-                return new SpannableItemEntry[size];
-            }
-        };
-    }
-
     private boolean mMeasuring;
 
     public SpannableGridLayoutManager(Context context) {
@@ -91,20 +52,20 @@ public class SpannableGridLayoutManager extends GridLayoutManager {
         super(orientation, numColumns, numRows);
     }
 
-    private int getChildWidth(int colSpan) {
-        return getLanes().getLaneSize() * colSpan;
-    }
-
-    private int getChildHeight(int rowSpan) {
-        return getLanes().getLaneSize() * rowSpan;
-    }
-
     private static int getLaneSpan(LayoutParams lp, boolean isVertical) {
         return (isVertical ? lp.colSpan : lp.rowSpan);
     }
 
     private static int getLaneSpan(SpannableItemEntry entry, boolean isVertical) {
         return (isVertical ? entry.colSpan : entry.rowSpan);
+    }
+
+    private int getChildWidth(int colSpan) {
+        return getLanes().getLaneSize() * colSpan;
+    }
+
+    private int getChildHeight(int rowSpan) {
+        return getLanes().getLaneSize() * rowSpan;
     }
 
     @Override
@@ -237,7 +198,7 @@ public class SpannableGridLayoutManager extends GridLayoutManager {
     @Override
     public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
         if (lp.width != LayoutParams.MATCH_PARENT ||
-            lp.height != LayoutParams.MATCH_PARENT) {
+                lp.height != LayoutParams.MATCH_PARENT) {
             return false;
         }
 
@@ -284,6 +245,42 @@ public class SpannableGridLayoutManager extends GridLayoutManager {
     @Override
     public LayoutParams generateLayoutParams(Context c, AttributeSet attrs) {
         return new LayoutParams(c, attrs);
+    }
+
+    protected static class SpannableItemEntry extends BaseLayoutManager.ItemEntry {
+        public static final Parcelable.Creator<SpannableItemEntry> CREATOR
+                = new Parcelable.Creator<SpannableItemEntry>() {
+            @Override
+            public SpannableItemEntry createFromParcel(Parcel in) {
+                return new SpannableItemEntry(in);
+            }
+
+            @Override
+            public SpannableItemEntry[] newArray(int size) {
+                return new SpannableItemEntry[size];
+            }
+        };
+        private final int colSpan;
+        private final int rowSpan;
+
+        public SpannableItemEntry(int startLane, int anchorLane, int colSpan, int rowSpan) {
+            super(startLane, anchorLane);
+            this.colSpan = colSpan;
+            this.rowSpan = rowSpan;
+        }
+
+        public SpannableItemEntry(Parcel in) {
+            super(in);
+            this.colSpan = in.readInt();
+            this.rowSpan = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(colSpan);
+            out.writeInt(rowSpan);
+        }
     }
 
     public static class LayoutParams extends TwoWayView.LayoutParams {

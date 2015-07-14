@@ -21,11 +21,7 @@
 
 package org.lucasr.twowayview.widget;
 
-import android.util.Log;
 import android.util.SparseArray;
-
-import java.util.Arrays;
-
 import org.lucasr.twowayview.widget.BaseLayoutManager.ItemEntry;
 
 class ItemEntries {
@@ -37,7 +33,7 @@ class ItemEntries {
     }
 
     public void putItemEntry(int position, ItemEntry entry) {
-        mItemEntries.put(position,entry);
+        mItemEntries.put(position, entry);
     }
 
     public void restoreItemEntry(int position, ItemEntry entry) {
@@ -47,18 +43,18 @@ class ItemEntries {
 
     /**
      * From android.util.SparseArray:
-     *
+     * <p/>
      * The keys corresponding to indices in ascending order are guaranteed to be in ascending
      * order, e.g., keyAt(0) will return the smallest key and keyAt(size()-1) will return the
      * largest key.
      */
 
     public int size() {
-        return (mItemEntries.size()==0 ? 0 : mItemEntries.keyAt(mItemEntries.size()-1));
+        return (mItemEntries.size() == 0 ? 0 : mItemEntries.keyAt(mItemEntries.size() - 1));
     }
 
     public void invalidateItemLanesAfter(int position) {
-        if (mItemEntries.size()==0 || position > mItemEntries.keyAt(mItemEntries.size()-1)) {
+        if (mItemEntries.size() == 0 || position > mItemEntries.keyAt(mItemEntries.size() - 1)) {
             return;
         }
 
@@ -74,10 +70,10 @@ class ItemEntries {
 
     void offsetForRemoval(int positionStart, int itemCount) {
 
-        for(int n = 0; n < (mItemEntries.size() - positionStart - itemCount); n++) {
+        for (int n = 0; n < (mItemEntries.size() - positionStart - itemCount); n++) {
 
-            int actualPosition = positionStart+itemCount+n;
-            int movedPosition = positionStart+n;
+            int actualPosition = positionStart + itemCount + n;
+            int movedPosition = positionStart + n;
 
             ItemEntry temp = mItemEntries.get(actualPosition);
             mItemEntries.remove(actualPosition);
@@ -89,10 +85,10 @@ class ItemEntries {
 
     void offsetForAddition(int positionStart, int itemCount) {
 
-        for(int n = 0; n < itemCount; n++) {
+        for (int n = 0; n < itemCount; n++) {
 
-            int actualPosition = positionStart+n;
-            int movedPosition = positionStart+itemCount+n;
+            int actualPosition = positionStart + n;
+            int movedPosition = positionStart + itemCount + n;
 
             ItemEntry temp = mItemEntries.get(actualPosition);
             mItemEntries.remove(actualPosition);

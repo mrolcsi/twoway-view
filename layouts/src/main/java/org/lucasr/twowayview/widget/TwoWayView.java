@@ -21,7 +21,6 @@ import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-
 import org.lucasr.twowayview.TwoWayLayoutManager;
 import org.lucasr.twowayview.TwoWayLayoutManager.Orientation;
 
@@ -30,7 +29,7 @@ import java.lang.reflect.Constructor;
 public class TwoWayView extends RecyclerView {
     private static final String LOGTAG = "TwoWayView";
 
-    private static final Class<?>[] sConstructorSignature = new Class[] {
+    private static final Class<?>[] sConstructorSignature = new Class[]{
             Context.class, AttributeSet.class};
 
     final Object[] sConstructorArgs = new Object[2];
@@ -79,7 +78,7 @@ public class TwoWayView extends RecyclerView {
             setLayoutManager(constructor.newInstance(sConstructorArgs));
         } catch (Exception e) {
             throw new IllegalStateException("Could not load TwoWayLayoutManager from " +
-                                             "class: " + name, e);
+                    "class: " + name, e);
         }
     }
 
@@ -87,7 +86,7 @@ public class TwoWayView extends RecyclerView {
     public void setLayoutManager(LayoutManager layout) {
         if (!(layout instanceof TwoWayLayoutManager)) {
             throw new IllegalArgumentException("TwoWayView can only use TwoWayLayoutManager " +
-                                                "subclasses as its layout manager");
+                    "subclasses as its layout manager");
         }
 
         super.setLayoutManager(layout);

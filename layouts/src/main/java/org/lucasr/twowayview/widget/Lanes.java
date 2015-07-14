@@ -17,7 +17,6 @@
 package org.lucasr.twowayview.widget;
 
 import android.graphics.Rect;
-
 import org.lucasr.twowayview.TwoWayLayoutManager.Direction;
 import org.lucasr.twowayview.TwoWayLayoutManager.Orientation;
 
@@ -35,25 +34,6 @@ class Lanes {
 
     private Integer mInnerStart;
     private Integer mInnerEnd;
-
-    public static class LaneInfo {
-        public int startLane;
-        public int anchorLane;
-
-        public boolean isUndefined() {
-            return (startLane == NO_LANE || anchorLane == NO_LANE);
-        }
-
-        public void set(int startLane, int anchorLane) {
-            this.startLane = startLane;
-            this.anchorLane = anchorLane;
-        }
-
-        public void setUndefined() {
-            startLane = NO_LANE;
-            anchorLane = NO_LANE;
-        }
-    }
 
     public Lanes(BaseLayoutManager layout, Orientation orientation, Rect[] lanes, int laneSize) {
         mLayout = layout;
@@ -271,7 +251,7 @@ class Lanes {
             }
 
             if ((direction == Direction.END && laneEdge < targetEdge) ||
-                (direction == Direction.START && laneEdge > targetEdge)) {
+                    (direction == Direction.START && laneEdge > targetEdge)) {
 
                 final int targetLane = findLaneThatFitsSpan(l, laneSpan, direction);
                 if (targetLane != NO_LANE) {
@@ -308,7 +288,7 @@ class Lanes {
             final Rect laneRect = mLanes[i];
 
             laneRect.offsetTo(mIsVertical ? laneRect.left : offset,
-                              mIsVertical ? offset : laneRect.top);
+                    mIsVertical ? offset : laneRect.top);
 
             if (mIsVertical) {
                 laneRect.bottom = laneRect.top;
@@ -346,5 +326,24 @@ class Lanes {
         }
 
         return mInnerEnd;
+    }
+
+    public static class LaneInfo {
+        public int startLane;
+        public int anchorLane;
+
+        public boolean isUndefined() {
+            return (startLane == NO_LANE || anchorLane == NO_LANE);
+        }
+
+        public void set(int startLane, int anchorLane) {
+            this.startLane = startLane;
+            this.anchorLane = anchorLane;
+        }
+
+        public void setUndefined() {
+            startLane = NO_LANE;
+            anchorLane = NO_LANE;
+        }
     }
 }

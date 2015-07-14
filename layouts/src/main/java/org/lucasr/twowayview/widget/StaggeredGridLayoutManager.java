@@ -27,7 +27,6 @@ import android.support.v7.widget.RecyclerView.State;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-
 import org.lucasr.twowayview.widget.Lanes.LaneInfo;
 
 public class StaggeredGridLayoutManager extends GridLayoutManager {
@@ -35,45 +34,6 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
 
     private static final int DEFAULT_NUM_COLS = 2;
     private static final int DEFAULT_NUM_ROWS = 2;
-
-    protected static class StaggeredItemEntry extends BaseLayoutManager.ItemEntry {
-        private final int span;
-        private int width;
-        private int height;
-
-        public StaggeredItemEntry(int startLane, int anchorLane, int span) {
-            super(startLane, anchorLane);
-            this.span = span;
-        }
-
-        public StaggeredItemEntry(Parcel in) {
-            super(in);
-            this.span = in.readInt();
-            this.width = in.readInt();
-            this.height = in.readInt();
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(span);
-            out.writeInt(width);
-            out.writeInt(height);
-        }
-
-        public static final Parcelable.Creator<StaggeredItemEntry> CREATOR
-                = new Parcelable.Creator<StaggeredItemEntry>() {
-            @Override
-            public StaggeredItemEntry createFromParcel(Parcel in) {
-                return new StaggeredItemEntry(in);
-            }
-
-            @Override
-            public StaggeredItemEntry[] newArray(int size) {
-                return new StaggeredItemEntry[size];
-            }
-        };
-    }
 
     public StaggeredGridLayoutManager(Context context) {
         this(context, null);
@@ -263,6 +223,44 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
     @Override
     public LayoutParams generateLayoutParams(Context c, AttributeSet attrs) {
         return new LayoutParams(c, attrs);
+    }
+
+    protected static class StaggeredItemEntry extends BaseLayoutManager.ItemEntry {
+        public static final Parcelable.Creator<StaggeredItemEntry> CREATOR
+                = new Parcelable.Creator<StaggeredItemEntry>() {
+            @Override
+            public StaggeredItemEntry createFromParcel(Parcel in) {
+                return new StaggeredItemEntry(in);
+            }
+
+            @Override
+            public StaggeredItemEntry[] newArray(int size) {
+                return new StaggeredItemEntry[size];
+            }
+        };
+        private final int span;
+        private int width;
+        private int height;
+
+        public StaggeredItemEntry(int startLane, int anchorLane, int span) {
+            super(startLane, anchorLane);
+            this.span = span;
+        }
+
+        public StaggeredItemEntry(Parcel in) {
+            super(in);
+            this.span = in.readInt();
+            this.width = in.readInt();
+            this.height = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(span);
+            out.writeInt(width);
+            out.writeInt(height);
+        }
     }
 
     public static class LayoutParams extends TwoWayView.LayoutParams {

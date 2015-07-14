@@ -22,7 +22,6 @@ import android.support.v7.widget.RecyclerView.Recycler;
 import android.support.v7.widget.RecyclerView.State;
 import android.util.AttributeSet;
 import android.view.View;
-
 import org.lucasr.twowayview.widget.Lanes.LaneInfo;
 
 public class GridLayoutManager extends BaseLayoutManager {
