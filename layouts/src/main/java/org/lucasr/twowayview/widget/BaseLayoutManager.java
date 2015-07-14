@@ -28,7 +28,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
-
 import org.lucasr.twowayview.TwoWayLayoutManager;
 import org.lucasr.twowayview.widget.Lanes.LaneInfo;
 
@@ -367,6 +366,7 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
 
         // Only move layout if we're not restoring a layout state.
         if (anchorItemPosition > 0 && (refreshingLanes || !restoringLanes)) {
+            handleUpdate();
             moveLayoutToPosition(anchorItemPosition, getPendingScrollOffset(), recycler, state);
         }
 
