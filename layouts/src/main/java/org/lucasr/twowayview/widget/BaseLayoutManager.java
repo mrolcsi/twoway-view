@@ -268,7 +268,9 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         final int anchorItemPosition = getAnchorItemPosition(state);
 
         // Only move layout if we're not restoring a layout state.
-        if (anchorItemPosition > 0 && (refreshingLanes || !restoringLanes)) {
+        // Issue #140 fix from
+        //      http://stackoverflow.com/questions/28431527/twowayview-automatically-add-padding-when-scrolling
+        if (anchorItemPosition > 0 && refreshingLanes && !restoringLanes) {
             handleUpdate();
             moveLayoutToPosition(anchorItemPosition, getPendingScrollOffset(), recycler, state);
         }
