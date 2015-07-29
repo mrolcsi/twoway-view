@@ -1,5 +1,6 @@
 package org.lucasr.twowayview;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.v4.view.GestureDetectorCompat;
@@ -20,6 +21,7 @@ abstract class ClickItemTouchListener implements OnItemTouchListener {
                 new ItemClickGestureListener(hostView));
     }
 
+    @TargetApi(19)
     private boolean isAttachedToWindow(RecyclerView hostView) {
         if (Build.VERSION.SDK_INT >= 19) {
             return hostView.isAttachedToWindow();
