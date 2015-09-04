@@ -298,7 +298,7 @@ public class ItemSelectionSupport {
 
     public void onAdapterDataChanged() {
         final Adapter adapter = mRecyclerView.getAdapter();
-        if (mChoiceMode == ChoiceMode.NONE || adapter == null || !adapter.hasStableIds()) {
+        if (mChoiceMode == ChoiceMode.NONE || adapter == null || !adapter.hasStableIds() || mCheckedIdStates == null) {
             return;
         }
 
